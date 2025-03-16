@@ -46,7 +46,7 @@ class MissingFlagError(Exception):
     
     Usage:
         --<long-flag> must be with *--<other-flags>
-        --<long-flag> requires flags.
+        <cmd> command requires flags.
     """
     ...
     

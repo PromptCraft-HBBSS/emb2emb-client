@@ -22,7 +22,7 @@ def help(flags: Dict[str, List[FlagNameConfig]]):
     """
 
     if len(flags) == 0:
-        ...
+        raise MissingFlagError('help command requires flags.')
     else:
         if len(flags) == 1:
             if flags[0] == 'help':
