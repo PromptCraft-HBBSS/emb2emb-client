@@ -79,7 +79,7 @@ class DatabaseManager:
         store.set('table', table)
         return self.conn
     
-    def ls(self, table: str, limit: Optional[int] = 10, 
+    def fetch(self, table: str, limit: Optional[int] = 10, 
            old: bool = True, asc: bool = True) -> List[StoredConverse]:
         """Retrieve stored conversations with flexible temporal ordering.
         
@@ -127,6 +127,15 @@ class DatabaseManager:
         rows = self.cursor.fetchall()
         return [self._row_to_converse(row) for row in rows]
 
+    def tables(self) -> List[str]:
+        # Standard cross-version solution
+        self.cursor.execute("""
+            SELECT name FROM sqlite_master 
+            WHERE type='table' 
+            AND name NOT LIKE 'sqlite_%'
+        """)
+        return [row[0] for row in self.cursor.fetchall()]
+        
     def _row_to_converse(self, row: tuple) -> StoredConverse:
         """Convert database row to StoredConverse instance.
         

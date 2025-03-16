@@ -15,9 +15,14 @@ from models.memglobalstore_model import global_manager
 
 # MARK: COMMANDS:
 @Command.register('new')
-def new(flags: Dict[str, List[str]]):
+def new(flags: Dict[FlagNameConfig, List[str]]):
+    """Create a datatable.
+    Arguments:
+        flags (Dict[FlagNameConfig, List[str]]): Arguments
+    """
     print(flags)
     flags = flagconfiglist2dic(flags);
+    
     if len(flags) == 0:
         raise MissingFlagError(f"new command requires flags.")
     

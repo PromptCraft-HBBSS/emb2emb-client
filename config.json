@@ -1,6 +1,6 @@
 {
     "commands": {
-        "ls": {
+        "fetch": {
             "flags": [
                 { "short": "l", "long": "limit" },
                 { "short": "a", "long": "all" },
@@ -9,12 +9,36 @@
                 { "short": "h", "long": "help" }
             ],
             "docs": {
-                "description": "List current embedded converses.",
+                "description": "Fetches current embedded converses.",
                 "additions": [
                     { "flag": "l", "add": "Fetch limit. Defaults to 10" },
                     { "flag": "a", "add": "Fetch all. Standalone, do not use with other flags" },
                     { "flag": "d", "add": "Whether or not to fetch in descending order"},
                     { "flag": "o", "add": "Whether or not to fetch oldest first"},
+                    { "flag": "h", "add": "Show help manual" }
+                ]
+            }
+        },
+        "ls": {
+            "flags": [
+                { "short": "q", "long": "query" },
+                { "short": "h", "long": "help" }
+            ],
+            "docs": {
+                "description": "Changes tablename pointer",
+                "additions": [
+                    { "flag": "q", "add": "Regex query string for filtering"},
+                    { "flag": "h", "add": "Show help manual" }
+                ]
+            }
+        },
+        "cd": {
+            "flags": [
+                { "short": "h", "long": "help" }
+            ],
+            "docs": {
+                "description": "Changes tablename pointer",
+                "additions": [
                     { "flag": "h", "add": "Show help manual" }
                 ]
             }

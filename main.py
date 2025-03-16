@@ -63,8 +63,8 @@ def repl():
             ClientConsole.error(f'MissingArgsError: {e}')
         except MissingFlagError as e:
             ClientConsole.error(f'MissingFlagError: {e}')
-        except KeyError as e:
-            ClientConsole.error(f'KeyError: {e}')
+        # except KeyError as e:
+        #     ClientConsole.error(f'KeyError: {e}')
         except ValueError as e:
             ClientConsole.error(f'ValueError: {e}')
         except sqlite3.OperationalError as e:

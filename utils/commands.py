@@ -14,6 +14,8 @@ from models.config_model import *
 
 
 # MARK: COMMANDS:
+from commands.fetch import fetch
 from commands.ls import ls
 from commands.new import new
+from commands.cd import cd
 from commands.help import help

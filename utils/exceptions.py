@@ -22,6 +22,14 @@ class ExcessiveArgsError(Exception):
         --<long-flag> accepts no args, got <actual>
     """
     ...
+    
+class UnexpectedArgsError(Exception):
+    """Exception raised when unidentified args are given
+    
+    Usage: 
+        <cmd> command expects *--<valid-flags>, got *--<unexpected-flags>
+    """
+    ...
 
 class MissingArgError(Exception):
     """Exception raised when less then required args are given
@@ -35,6 +43,7 @@ class ExcessiveFlagsError(Exception):
     """Exception raised when more then required flags are stacked
     
     Usage:
+        <cmd> command requires <valid-count> flags, got <actual>
         --<long-flag> must be with only *--<other-flags>
         --<long-flag> must be used alone
     """
@@ -46,7 +55,7 @@ class MissingFlagError(Exception):
     
     Usage:
         --<long-flag> must be with *--<other-flags>
-        --<long-flag> requires flags.
+        <cmd> command requires flags.
     """
     ...
     
