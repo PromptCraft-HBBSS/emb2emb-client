@@ -1,7 +1,7 @@
 # Created by Sean L. on Mar 16
 # 
 # emb2emb client
-# ls.py
+# help.py
 # 
 # PromptCraft, 2025. All rights reserved.
 
@@ -20,14 +20,15 @@ def help(flags: Dict[FlagNameConfig, List[str]]):
     Arguments:
         flags (Dict[FlagNameConfig, List[str]]): Arguments
     """
-
+    flags = flagconfiglist2dic(flags)
+    
     if len(flags) == 0:
         raise MissingFlagError('help command requires flags.')
     else:
         if len(flags) == 1:
-            if flags[0] == 'help':
+            if 'help' in flags:
                 ClientConsole.help('help')
-            if flags[0] == 'name':
+            if 'name' in flags:
                 for command in flags['name']:
                     ClientConsole.help(command.long)
         else:

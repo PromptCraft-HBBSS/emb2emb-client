@@ -22,6 +22,7 @@ def new(flags: Dict[FlagNameConfig, List[str]]):
     """
     print(flags)
     flags = flagconfiglist2dic(flags);
+    
     if len(flags) == 0:
         raise MissingFlagError(f"new command requires flags.")
     

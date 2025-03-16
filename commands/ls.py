@@ -13,51 +13,24 @@ from models.config_model import *
 from utils.exceptions import *
 from models.memglobalstore_model import global_manager
 
-# MARK: COMMANDS:
 @Command.register('ls')
 def ls(flags: Dict[FlagNameConfig, List[str]]):
-    """Lists all embeddings
+    """Lists all datatables
     Arguments:
         flags (Dict[FlagNameConfig, List[str]]): Arguments
     """
-    flags = flagconfiglist2dic(flags);
-
-    if len(flags) == 0:
-        raise MissingFlagError(f"ls command requires flags.")
-
-    if 'help' in flags:
-        ClientConsole.help('ls')
-        return
-
-    if 'all' in flags:
-        if len(flags['all']) > 0:  # Check for unexpected arguments
-            raise ExcessiveArgsError(f"--all flag doesn't accept args, got {len(flags['all'])}")
-        elif len(flags) > 1:  # Check for other flags
-            raise ExcessiveFlagsError("--all must be used alone")
-    elif 'limit' in flags:
-        if len(flags['limit']) == 0:  # Missing required argument
-            raise MissingArgError("--limit requires a numeric arg, got none")
-        elif len(flags['limit']) > 1:  # Multiple arguments
-            raise ExcessiveArgsError(f"--limit accepts 1 arg, got {len(flags['limit'])}")
-
-    desc = 'desc' in flags.keys()
-    old = 'old' in flags.keys()
-
-    # Get stored conversations
-    table = global_manager.get('tablename')
-    conversations = fetch_manager.ls(
-        table,
-        None if 'all' in flags else flags['limit'][0],
-        old,
-        not desc
-    )
-
-    ClientConsole.log(f'Total of {len(conversations)} entries fetched.')
-    if len(conversations) == 0:
-        ClientConsole.warn('No conversations found.')
-        return
-
-    for converse in conversations:
-        ClientConsole.print(converse.id, converse.prompt, converse.answer)
-
-    return
+    flags = flagconfiglist2dic(flags)
+    
+    if len(flags) != 0:
+        if 'help' in flags.keys():
+            ClientConsole.help('ls');
+            return
+        if 'query' in flags.keys():
+            ClientConsole.warn('FEATURE IN DEV')
+        if len(flags['ROOT']) == 0:
+            for table in fetch_manager.tables():
+                ClientConsole.print(table)
+            ClientConsole.warn('FEATURE IN DEV - ls -a')
+        else:
+            raise ExcessiveFlagsError(f'ls command expects --help or --query flags, got {' '.join(key for key in flags.keys() if key != 'ROOT')}')
+        

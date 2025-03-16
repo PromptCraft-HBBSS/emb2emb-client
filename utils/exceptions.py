@@ -22,6 +22,14 @@ class ExcessiveArgsError(Exception):
         --<long-flag> accepts no args, got <actual>
     """
     ...
+    
+class UnexpectedArgsError(Exception):
+    """Exception raised when unidentified args are given
+    
+    Usage: 
+        <cmd> command expects *--<valid-flags>, got *--<unexpected-flags>
+    """
+    ...
 
 class MissingArgError(Exception):
     """Exception raised when less then required args are given

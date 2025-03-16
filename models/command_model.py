@@ -73,17 +73,15 @@ class Command:
         tokens = cmd_str.split()
         if not tokens:
             raise ValueError("Empty command")
-
         name = tokens[0]
-        flags = {}
+        flags = {FlagNameConfig('', 'ROOT'): []}
         current_flag = None
-        
         for token in tokens[1:]:
             if token.startswith('--'):
                 long_flag = token[2:]
                 if long_flag not in [flag.long for flag in flag_map]:
                     raise ValueError(f"Unknown long flag: {token}")
-                current_flag = long_flag
+                current_flag = find_flag(long_flag)
                 flags[current_flag] = []
             elif token.startswith('-'):
                 short_flag = token[1:]
@@ -93,9 +91,9 @@ class Command:
                 flags[current_flag] = []
             else:
                 if not current_flag:
-                    raise ValueError(f"Argument before flags: {token}")
-                flags[current_flag].append(token)
-                
+                    flags[FlagNameConfig('', 'ROOT')].append(token)
+                else:
+                    flags[current_flag].append(token)
         return cls(name, flags)
 
     @classmethod
