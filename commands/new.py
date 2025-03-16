@@ -15,7 +15,8 @@ from models.memglobalstore_model import global_manager
 
 # MARK: COMMANDS:
 @Command.register('new')
-def new(flags: Dict[str, List[FlagNameConfig]]):
+def new(flags: Dict[str, List[str]]):
+    print(flags)
     flags = flagconfiglist2dic(flags);
     if len(flags) == 0:
         raise MissingFlagError(f"new command requires flags.")
