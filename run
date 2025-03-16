@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd /Users/makabaka1880/Documents/2025/PromptCraft/emb2emb/client/
+python3 main.py

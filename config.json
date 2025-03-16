@@ -1,0 +1,47 @@
+{
+    "commands": {
+        "ls": {
+            "flags": [
+                { "short": "l", "long": "limit" },
+                { "short": "a", "long": "all" },
+                { "short": "d", "long": "desc" },
+                { "short": "o", "long": "old" },
+                { "short": "h", "long": "help" }
+            ],
+            "docs": {
+                "description": "List current embedded converses.",
+                "additions": [
+                    { "flag": "l", "add": "Fetch limit. Defaults to 10" },
+                    { "flag": "a", "add": "Fetch all. Standalone, do not use with other flags" },
+                    { "flag": "d", "add": "Whether or not to fetch in descending order"},
+                    { "flag": "o", "add": "Whether or not to fetch oldest first"},
+                    { "flag": "h", "add": "Show help manual" }
+                ]
+            }
+        },
+        "new": {
+            "flags": [
+                { "short": "n", "long": "name" },
+                { "short": "h", "long": "help" }
+            ],
+            "docs": {
+                "description": "Creates a new datatable.",
+                "additions": [
+                    { "flag": "n", "add": "Name of new database" },
+                    { "flag": "h", "add": "Show help manual"}
+                ]
+            }
+        },
+        "help": {
+            "flags": [
+                { "short": "h", "long": "help" }
+            ],
+            "docs": {
+                "description": "Shows manual page.",
+                "additions": [
+                    { "flag": "h", "add": "Show help manual"}
+                ]
+            }
+        }
+    }
+}
