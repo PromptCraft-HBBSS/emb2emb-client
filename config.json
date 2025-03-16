@@ -6,15 +6,17 @@
                 { "short": "a", "long": "all" },
                 { "short": "d", "long": "desc" },
                 { "short": "o", "long": "old" },
+                { "short": "m", "long": "max-length"},
                 { "short": "h", "long": "help" }
             ],
             "docs": {
                 "description": "Fetches current embedded converses.",
                 "additions": [
                     { "flag": "l", "add": "Fetch limit. Defaults to 10" },
-                    { "flag": "a", "add": "Fetch all. Standalone, do not use with other flags" },
+                    { "flag": "a", "add": "Fetch all, do not use with --limit" },
                     { "flag": "d", "add": "Whether or not to fetch in descending order"},
                     { "flag": "o", "add": "Whether or not to fetch oldest first"},
+                    { "flag": "m", "add": "Max length of string before concentrating"},
                     { "flag": "h", "add": "Show help manual" }
                 ]
             }
@@ -25,7 +27,7 @@
                 { "short": "h", "long": "help" }
             ],
             "docs": {
-                "description": "Changes tablename pointer",
+                "description": "Shows tables",
                 "additions": [
                     { "flag": "q", "add": "Regex query string for filtering"},
                     { "flag": "h", "add": "Show help manual" }

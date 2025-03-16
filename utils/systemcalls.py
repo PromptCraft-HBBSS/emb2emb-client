@@ -13,3 +13,10 @@ def clear():
     except ImportError:
         import os
         os.system('cls||clear')
+
+def width():
+    import os
+    import subprocess
+
+    result = subprocess.run(['tput', 'cols'], stdout=subprocess.PIPE)
+    return int(result.stdout.decode().strip())

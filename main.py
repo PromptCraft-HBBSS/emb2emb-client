@@ -6,7 +6,7 @@
 # PromptCraft, 2025. All rights reserved.
 
 # MARK: Imports
-from utils.systemcalls import clear
+from utils.systemcalls import clear, width
 clear()
 from utils.output import ClientConsole
 ClientConsole.log('Loading app...')
@@ -35,7 +35,9 @@ ClientConsole.print('[cyan]Welcome to Labelist Client for emb2emb.[/cyan]')
 def repl():
     while True:
         try:
-            statement = input(f'{memGlobalManger.get('tablename')} → ')
+            print('-' * width())
+            print(f'╭─ {memGlobalManger.get('tablename')}')
+            statement = input(f'╰─ ')
             for f in statement.split(';'):
                 f = f.strip()
                 if f == '':
@@ -69,7 +71,6 @@ def repl():
             ClientConsole.error(f'ValueError: {e}')
         except sqlite3.OperationalError as e:
             ClientConsole.error(f'SQLITE OperationalError: {e}')
-                
 
 # MARK: Entrance
 if __name__ == '__main__':
