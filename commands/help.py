@@ -21,11 +21,16 @@ def help(flags: Dict[str, List[FlagNameConfig]]):
         flags (Dict[str, List[str]]): Arguments
     """
 
-    if len(flags) != 0:
-        if len(flags) == 1 and flags[0] == 'help':
-            ClientConsole.help('help')
+    if len(flags) == 0:
+        ...
+    else:
+        if len(flags) == 1:
+            if flags[0] == 'help':
+                ClientConsole.help('help')
+            if flags[0] == 'name':
+                for command in flags['name']:
+                    ClientConsole.help(command.long)
         else:
             raise ExcessiveFlagsError('')
     
     ClientConsole.warn('FEATURE UNDER DEVELOPMENT')
-    

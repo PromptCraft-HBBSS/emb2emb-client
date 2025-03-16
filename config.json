@@ -34,11 +34,13 @@
         },
         "help": {
             "flags": [
+                { "short": "n", "long": "name" },
                 { "short": "h", "long": "help" }
             ],
             "docs": {
                 "description": "Shows manual page.",
                 "additions": [
+                    { "flag": "n", "add": "Name of command to show manual page" },
                     { "flag": "h", "add": "Show help manual"}
                 ]
             }
