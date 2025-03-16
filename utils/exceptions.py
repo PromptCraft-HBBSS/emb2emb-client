@@ -58,7 +58,14 @@ class MissingFlagError(Exception):
         <cmd> command requires flags.
     """
     ...
-    
+
+class ArgumentValueError(Exception):
+    """Exception raised when the type of an argument is invalid.
+
+    Usage:
+        --<long-flag> required arg(s) of type <valid-type>, got <invalid-type>
+    """
+
 # MARK: Database Manip Exceptions
 
 class TableExistsError(Exception):

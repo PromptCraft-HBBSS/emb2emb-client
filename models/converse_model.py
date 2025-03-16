@@ -8,14 +8,14 @@
 from utils.embed import embed
 from numpy import ndarray
 from datetime import datetime
-from typing import Optional
-
+from typing import Optional, List
+    
 class Converse:
     """Represents a conversation exchange with vector embeddings.
     
     Attributes:
         prompt (str): User's original input text
-        answer (str): AI model's generated response
+        answer (str): LLM model's generated response
         veci (ndarray): 384-dim embedding of prompt (GPT-4o vector space)
         veco (ndarray): 384-dim embedding of answer (GPT-4o vector space)
     
@@ -93,7 +93,7 @@ class StoredConverse(Converse):
     id: Optional[int]
     timestamp: datetime
 
-    def __init__(self, id: int, timestamp: datetime, prompt: str, answer: str):
+    def __init__(self, id: int, timestamp: datetime, prompt: str, answer: str, veci: ndarray, veco: ndarray):
         """Initializes for database insertion (id auto-assigned).
         
         Parameters:
@@ -105,8 +105,8 @@ class StoredConverse(Converse):
         super().__init__(
             prompt=prompt,
             answer=answer,
-            veci=embed(prompt),
-            domo=embed(answer)
+            veci=veci,
+            veco=veco
         )
         self.id = id
         self.timestamp = timestamp
@@ -129,3 +129,36 @@ class StoredConverse(Converse):
             veci=self.veci,
             veco=self.veco
         )
+
+class ConverseTable:
+    """Represents an array of Converse instances, similar to that of a datatable in the main database.
+
+    Attributes:
+        name (str): Name of the datatable
+        conversations (List[StoredConverse]): A list of converses.
+    
+    Example:
+        >>> conv = StoredConverse.create(
+        ...     prompt="What's quantum computing?",
+        ...     answer="Quantum computing leverages..."
+        ... )
+        >>> convs = ConverseTable("temp", conversations = [conv])
+        >>> convs.conversations[0].veci.shape
+        (384,)
+        >>> len(convs.conversations[0].answer)
+        27
+    """
+    
+    name: str
+    conversations: List[StoredConverse]
+    
+    def __init__(self, name: str, conversations: List[StoredConverse] = []):
+        """Initializes a ConverseTable instance.
+
+        Args:
+            name (str): _description_
+            conversations (List[StoredStoredConverse], optional): _description_. Defaults to [].
+        """
+        self.name = name
+        self.conversations = conversations
+        

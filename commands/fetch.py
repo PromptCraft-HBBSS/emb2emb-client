@@ -24,21 +24,35 @@ def fetch(flags: Dict[FlagNameConfig, List[str]]):
     if len(flags) == 0:
         raise MissingFlagError(f"ls command requires flags.")
 
-    if 'help' in flags:
+    if 'help' in flags.keys():
         ClientConsole.help('ls')
         return
 
-    if 'all' in flags:
+    if 'all' in flags.keys():
         if len(flags['all']) > 0:  # Check for 
             raise ExcessiveArgsError(f"--all flag doesn't accept args, got {len(flags['all'])}")
-        elif len(flags) > 2:  # Check for other flags
-            raise ExcessiveFlagsError("--all must be used alone")
-    elif 'limit' in flags:
+        elif 'limit' in flags.keys():  # Check for other flags
+            raise ExcessiveFlagsError("--all must be used independent of limit")
+
+    elif 'limit' in flags.keys():
         if len(flags['limit']) == 0:  # Missing required argument
             raise MissingArgError("--limit requires a numeric arg, got none")
         elif len(flags['limit']) > 1:  # Multiple arguments
             raise ExcessiveArgsError(f"--limit accepts 1 arg, got {len(flags['limit'])}")
 
+    maxl = None
+    
+    if 'max-length' in flags.keys():
+        if len(flags['max-length']) == 0:  # Missing required argument
+            raise MissingArgError("--max-length requires a numeric arg, got none")
+        elif len(flags['max-length']) > 1:  # Missing required argument
+            raise ExcessiveArgsError(f"--max-length requires a numeric arg, got {len(flags['max-length'])}")
+        else:
+            try:
+                maxl = int(flags['max-length'][0])
+            except ValueError as e:
+                raise ArgumentValueError(f'--max-length required arg of type int, got str ({maxl})')
+            
     desc = 'desc' in flags.keys()
     old = 'old' in flags.keys()
 
@@ -51,19 +65,21 @@ def fetch(flags: Dict[FlagNameConfig, List[str]]):
     
     # Get stored conversations
     table = global_manager.get('tablename')
-    conversations = fetch_manager.fetch(
+    table = fetch_manager.fetch(
         table,
         None if 'all' in flags else flags['limit'][0],
         old,
         not desc
     )
 
-    ClientConsole.log(f'Total of {len(conversations)} entries fetched.')
-    if len(conversations) == 0:
+    ClientConsole.log(f'Total of {len(table.conversations)} entries fetched.')
+    if len(table.conversations) == 0:
         ClientConsole.warn('No conversations found.')
         return
-
-    for converse in conversations:
-        ClientConsole.print(converse.id, converse.prompt, converse.answer)
-
+    for converse in table.conversations:
+        ClientConsole.print(
+f"""
+[#004499]({converse.id}) [{converse.timestamp}][/#004499] 
+[bold]PROMPT[/bold] {converse.prompt}
+[bold]PROMPT[/bold] {converse.answer}""")
     return

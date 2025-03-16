@@ -9,12 +9,12 @@ import sqlite3
 import datetime
 from typing import Dict, List, Optional
 import numpy as np
-from models.memglobalstore_model import MemGlobalStore
-from models.converse_model import Converse, StoredConverse
+from models.memglobalstore_model import global_manager
+from models.converse_model import Converse, StoredConverse, ConverseTable
 from utils.exceptions import TableExistsError
 from utils.const import DB_PATH
 
-store = MemGlobalStore(':memory:')
+
 
 class DatabaseManager:
     """A class for managing transactions with the db
@@ -37,10 +37,11 @@ class DatabaseManager:
         Args:
             converse (Converse): A peice of conversation between the model and the user, along with embedded vectors.
         """
-        table = store.get('tablename')
+        # table = global_manager.get('tablename')
+        table = 'main'
         self.cursor.execute(f'''
                        INSERT INTO {table} (text, answer, veci, veco) values
-                       (?{', ?' * 769})
+                       (?, ?, ?, ?)
                        ''', (converse.prompt, converse.answer, ' '.join(map(str, converse.veci)), ' '.join(map(str, converse.veco))))
         self.conn.commit()
     
@@ -76,45 +77,42 @@ class DatabaseManager:
             else:
                 raise
         self.conn.commit()
-        store.set('table', table)
+        global_manager.set('table', table)
         return self.conn
     
     def fetch(self, table: str, limit: Optional[int] = 10, 
-           old: bool = True, asc: bool = True) -> List[StoredConverse]:
-        """Retrieve stored conversations with flexible temporal ordering.
-        
-        Implements a double-sorted query pattern to first select historical records
-        then reorder results. Combines SQL-level sorting with application-level
-        validation.
+        old: bool = True, asc: bool = True) -> ConverseTable:
+        """Retrieve conversations as a structured table with metadata.
         
         Parameters:
-            table (str): Target SQL table name (sanitized)
+            table (str): Target table name used for both SQL query and result labeling
             limit (Optional[int]): Max records to return (10 default)
             old (bool): True = prioritize older entries in initial selection
             asc (bool): True = final output in ascending order
         
         Returns:
-            List[StoredConverse]: Conversation records with DB metadata
+            ConverseTable: Structured result container with:
+            - name: Original table name from database
+            - conversations: List of StoredConverse records with full metadata
         
         Example:
-            >>> db.ls("chat_logs", limit=5, old=False, asc=True)
-            [<StoredConverse id=115>, <StoredConverse id=114>...]
-        
-        Raises:
-            sqlite3.OperationalError: On invalid table name or SQL syntax
-            ValueError: If input parameters fail validation
+            >>> table = db.fetch("chat_logs", limit=5)
+            >>> print(f"Table {table.name} has {len(table.conversations)} records")
+            Table chat_logs has 5 records
+            >>> isinstance(table.conversations[0], StoredConverse)
+            True
         """
         # Parameter validation
         if not isinstance(table, str) or not table.isidentifier():
             raise ValueError(f"Invalid table name: {table}")
-        
-        # Query construction with injection protection
+
+        # Query construction
         inner_order = "ASC" if old else "DESC"
         outer_order = "ASC" if asc else "DESC"
         limit_clause = f"LIMIT {limit}" if limit is not None else ""
         
         query = f"""
-        SELECT id, timestamp, prompt, answer 
+        SELECT id, timestamp, prompt, answer, veci, veco 
         FROM (
             SELECT * FROM {table}
             ORDER BY id {inner_order}
@@ -125,29 +123,61 @@ class DatabaseManager:
         
         self.cursor.execute(query)
         rows = self.cursor.fetchall()
-        return [self._row_to_converse(row) for row in rows]
+        
+        return ConverseTable(
+            name=table,
+            conversations=[self._row_to_converse(row) for row in rows]
+        )
 
-    def tables(self) -> List[str]:
-        # Standard cross-version solution
+    def tables(self) -> List[ConverseTable]:
+        """Retrieves all conversation tables with their metadata and contents.
+        
+        Returns:
+            List[ConverseTable]: Structured tables containing:
+            - Table name from SQL schema [1](@ref)
+            - Full conversation history with embeddings
+            - Database metadata including timestamps
+        
+        Example:
+            >>> db.tables()
+            [<ConverseTable name=main (15 convs)>, <ConverseTable name=chat_logs (203 convs)>]
+        """
         self.cursor.execute("""
             SELECT name FROM sqlite_master 
             WHERE type='table' 
             AND name NOT LIKE 'sqlite_%'
         """)
-        return [row[0] for row in self.cursor.fetchall()]
+        
+        return [
+            ConverseTable(
+                name=row[0],
+                conversations=[
+                    StoredConverse(
+                        id=conv.id,
+                        timestamp=conv.timestamp,
+                        prompt=conv.prompt,
+                        answer=conv.answer,
+                        veci=conv.veci,
+                        veco=conv.veco
+                    ) for conv in self.fetch(table=row[0], limit=None)
+                ]
+            ) for row in self.cursor.fetchall()
+        ]
         
     def _row_to_converse(self, row: tuple) -> StoredConverse:
         """Convert database row to StoredConverse instance.
         
         """
         conv = StoredConverse(
+            id=row[0],
+            timestamp=row[1],
             prompt=row[2], 
             answer=row[3],
-            veci=np.fromstring(row['veci'], sep=' ', dtype=np.float32),
-            veco=np.fromstring(row['veco'], sep=' ', dtype=np.float32)
+            veci=np.fromstring(row[4], sep=' ', dtype=np.float32),
+            veco=np.fromstring(row[5], sep=' ', dtype=np.float32)
         )
         conv.id = row[0]
-        conv.timestamp = datetime.fromisoformat(row[1])
+        conv.timestamp = row[1]
         return conv
 
 
