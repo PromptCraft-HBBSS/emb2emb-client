@@ -5,23 +5,19 @@
 # 
 # PromptCraft, 2025. All rights reserved.
 
-# Created by Sean L. on Mar 15
-# 
-# emb2emb client
-# embed.py
-# 
-# PromptCraft, 2025. All rights reserved.
-
 from sentence_transformers import SentenceTransformer
 from numpy import ndarray
 from typing import Optional
 from utils.output import ClientConsole
 from utils.const import EMBEDDING_MODEL_PATH
+from utils.performance import PerformanceMetrics
 
 ClientConsole.log('Loading BERT model...')
+
 model = SentenceTransformer(EMBEDDING_MODEL_PATH)
 ClientConsole.done('Embedding model loaded.')
 
+@PerformanceMetrics.runtime_monitor
 def embed(string: str) -> ndarray:
     """Generate embeddings with model verification
     

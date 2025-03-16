@@ -18,4 +18,7 @@ from commands.fetch import fetch
 from commands.ls import ls
 from commands.new import new
 from commands.cd import cd
+from commands.clear import clear
+from commands.set import set_env
+from commands.get import get_env
 from commands.help import help

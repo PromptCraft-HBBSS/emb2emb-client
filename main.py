@@ -46,6 +46,7 @@ def repl():
                     raise ProgramTermination('EXIT')
                 if not f.split()[0] in COMMANDS.keys():
                     raise CommandNotFoundError(f'{f.split()[0]} is not a valid command.')
+                print(f.split()[0])
                 flags = COMMANDS[f.split()[0]].flags.values();
                 cmd = Command.parse(f, flags);
                 cmd.act()
@@ -65,8 +66,10 @@ def repl():
             ClientConsole.error(f'MissingArgsError: {e}')
         except MissingFlagError as e:
             ClientConsole.error(f'MissingFlagError: {e}')
-        # except KeyError as e:
-        #     ClientConsole.error(f'KeyError: {e}')
+        except ArgumentValueError as e:
+            ClientConsole.error(f'ArgumentValueError: {e}')
+        except KeyError as e:
+            ClientConsole.error(f'KeyError: {e}')
         except ValueError as e:
             ClientConsole.error(f'ValueError: {e}')
         except sqlite3.OperationalError as e:

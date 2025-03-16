@@ -106,6 +106,7 @@ class MemGlobalStore:
         if row:
             # Access columns by index instead of name
             return self._deserialize(row[0], row[1])
+
         return None
     
     def _infer_type(self, value: Any) -> str:
