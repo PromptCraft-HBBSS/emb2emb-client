@@ -42,7 +42,46 @@ class Command:
 
     @classmethod
     def parse(cls, cmd_str: str, flag_map: List[FlagNameConfig]):
-        """Final parser with quote-preserving tokenization and type conversion"""
+        """Parse command string into structured Command object with type conversion.
+
+        Handles quoted arguments and automatic type conversion of unquoted values using
+        the following logic:
+        - Quoted values preserve exact string content
+        - Unquoted values attempt conversion: bool → int → float → string fallback
+        - Validates flag existence and argument positioning
+
+        Arguments:
+            cmd_str (str): Raw command input to parse (e.g. "cmd -f 'value'")
+            flag_map (List[FlagNameConfig]): Supported flags configuration containing:
+                - short (str): Single-character flag identifier
+                - long (str): Full flag name
+
+        Returns:
+            Command: Structured representation with:
+                - name: Base command identifier
+                - flags: Dictionary mapping FlagNameConfig to parsed arguments
+
+        Raises:
+            ValueError: For empty commands or unrecognized flags
+            ArgumentValueError: For type conversion failures or unclosed quotes
+
+        Example:
+            >>> flag_conf = [FlagNameConfig(short='p', long='param')]
+            >>> cmd = Command.parse("test 'root arg' -p 'hello' 123 True", flag_conf)
+            >>> cmd.flags
+            {
+                FlagNameConfig(short='p', long='param'): ['hello', 123, True],
+                FlagNameConfig(short='', long='ROOT'): ['root arg']
+            }
+
+        Parsing Logic:
+            1. Tokenize input with quote preservation using shlex
+            2. Validate command structure and flag existence
+            3. Convert arguments using type-aware parsing:
+            - Quoted → raw string (strip surrounding quotes)
+            - Unquoted → bool/int/float autoconversion
+            4. Group arguments under their corresponding flags
+        """
         try:
             tokens, quoted = cls._tokenize(cmd_str)
         except ValueError as e:
