@@ -12,7 +12,7 @@ from models.dbmanip import fetch_manager
 from models.config_model import *
 from utils.exceptions import *
 from models.memglobalstore_model import global_manager
-from utils.systemcalls import clear
+import utils.systemcalls
 
 # MARK: COMMANDS:
 @Command.register('clear')
@@ -26,8 +26,10 @@ def clear(flags: Dict[FlagNameConfig, List[str]]):
         if len(flags) == 1 and 'help' in flags.keys():
             ClientConsole.help('clear')
             return
+        if len(flags) == 1 and 'ROOT' in flags.keys():
+            return
         else:
             raise ExcessiveFlagsError(f'clear command requires no flags, got {[flag for flag in flags.keys()]}')
     else:
-        clear()
+        utils.systemcalls.clear()
         return

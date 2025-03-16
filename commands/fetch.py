@@ -12,8 +12,11 @@ from models.dbmanip import fetch_manager
 from models.config_model import *
 from utils.exceptions import *
 from models.memglobalstore_model import global_manager
+from utils.performance import PerformanceMetrics
 
 # MARK: COMMANDS:
+
+@PerformanceMetrics.runtime_monitor
 @Command.register('fetch')
 def fetch(flags: Dict[FlagNameConfig, List[str]]):
     """Fetches current embedded converses.

@@ -1,5 +1,27 @@
 {
     "commands": {
+        "cd": {
+            "flags": [
+                { "short": "h", "long": "help" }
+            ],
+            "docs": {
+                "description": "Changes tablename pointer",
+                "additions": [
+                    { "flag": "h", "add": "Show help manual" }
+                ]
+            }
+        },
+        "clear": {
+            "flags": [
+                { "short": "h", "long": "help" }
+            ],
+            "docs": {
+                "description": "Clears TUI.",
+                "additions": [
+                    { "flag": "h", "add": "Show help manual"}
+                ]
+            }
+        },
         "fetch": {
             "flags": [
                 { "short": "l", "long": "limit" },
@@ -7,7 +29,8 @@
                 { "short": "d", "long": "desc" },
                 { "short": "o", "long": "old" },
                 { "short": "m", "long": "max-length"},
-                { "short": "h", "long": "help" }
+                { "short": "h", "long": "help" },
+                { "short": "q", "long": "query" }
             ],
             "docs": {
                 "description": "Fetches current embedded converses.",
@@ -17,7 +40,21 @@
                     { "flag": "d", "add": "Whether or not to fetch in descending order"},
                     { "flag": "o", "add": "Whether or not to fetch oldest first"},
                     { "flag": "m", "add": "Max length of string before concentrating"},
+                    { "flag": "q", "add": "Regex query string for filtering"},
                     { "flag": "h", "add": "Show help manual" }
+                ]
+            }
+        },
+        "help": {
+            "flags": [
+                { "short": "n", "long": "name" },
+                { "short": "h", "long": "help" }
+            ],
+            "docs": {
+                "description": "Shows manual page.",
+                "additions": [
+                    { "flag": "n", "add": "Name of command to show manual page" },
+                    { "flag": "h", "add": "Show help manual"}
                 ]
             }
         },
@@ -30,17 +67,6 @@
                 "description": "Shows tables",
                 "additions": [
                     { "flag": "q", "add": "Regex query string for filtering"},
-                    { "flag": "h", "add": "Show help manual" }
-                ]
-            }
-        },
-        "cd": {
-            "flags": [
-                { "short": "h", "long": "help" }
-            ],
-            "docs": {
-                "description": "Changes tablename pointer",
-                "additions": [
                     { "flag": "h", "add": "Show help manual" }
                 ]
             }
@@ -58,15 +84,30 @@
                 ]
             }
         },
-        "help": {
+        "set": {
             "flags": [
-                { "short": "n", "long": "name" },
+                { "short": "k", "long": "key" },
+                { "short": "v", "long": "value" },
                 { "short": "h", "long": "help" }
             ],
             "docs": {
-                "description": "Shows manual page.",
+                "description": "Sets a global env key-value set.",
                 "additions": [
-                    { "flag": "n", "add": "Name of command to show manual page" },
+                    { "flag": "k", "add": "Key of pair" },
+                    { "flag": "v", "add": "Value of pair"},
+                    { "flag": "h", "add": "Show help manual"}
+                ]
+            }
+        },
+        "get": {
+            "flags": [
+                { "short": "k", "long": "key" },
+                { "short": "h", "long": "help" }
+            ],
+            "docs": {
+                "description": "Gets a global env key-value set.",
+                "additions": [
+                    { "flag": "k", "add": "Key of pair" },
                     { "flag": "h", "add": "Show help manual"}
                 ]
             }

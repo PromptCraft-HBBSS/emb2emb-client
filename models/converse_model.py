@@ -93,14 +93,14 @@ class StoredConverse(Converse):
     id: Optional[int]
     timestamp: datetime
 
-    def __init__(self, id: int, timestamp: datetime, prompt: str, answer: str, veci: ndarray, veco: ndarray):
+    def __init__(self, id: int, timestamp: str, prompt: str, answer: str, veci: ndarray, veco: ndarray):
         """Initializes for database insertion (id auto-assigned).
         
         Parameters:
             id (int): Integer id
             prompt (str): User input text (sanitized)
             answer (str): Model response (sanitized)
-            timestamp (datetime.datetime): Timestamp of creation
+            timestamp (str): Timestamp of creation
         """
         super().__init__(
             prompt=prompt,
@@ -109,7 +109,10 @@ class StoredConverse(Converse):
             veco=veco
         )
         self.id = id
-        self.timestamp = timestamp
+        if timestamp is None:
+            self.timestamp = None
+        else:
+            self.timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
 
     def to_transient(self) -> Converse:
         """Converts to non-persistent Converse object.

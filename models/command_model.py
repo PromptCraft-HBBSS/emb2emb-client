@@ -6,8 +6,9 @@
 # PromptCraft, 2025. All rights reserved.
 
 import shlex
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from models.config_model import *
+from utils.exceptions import ArgumentValueError
 
 class Command:
     """Represents a parsed command with flags and arguments for REPL handling.
@@ -41,47 +42,29 @@ class Command:
 
     @classmethod
     def parse(cls, cmd_str: str, flag_map: List[FlagNameConfig]):
-        """Parse raw command string into structured Command object.
-        
-        Parsing Logic:
-        1. Split command into tokens using whitespace
-        2. Validate flags against mapping
-        3. Group arguments under their corresponding flags
+        """Final parser with quote-preserving tokenization and type conversion"""
+        try:
+            tokens, quoted = cls._tokenize(cmd_str)
+        except ValueError as e:
+            raise ArgumentValueError(f"Open quote detected") from e
 
-        Args:
-            cmd_str (str): Raw command input string to parse
-            flag_map (List[FlagNameConfig]): For each element
-                - short (str): Single-character short flag (e.g., 'a')
-                - long (str): Corresponding long flag name (e.g., 'all')
-
-        Returns:
-            Command: Structured representation of parsed command
-
-        Raises:
-            ValueError: For various parsing failures including:
-                - Empty command input
-                - Unrecognized long flags
-                - Unmapped short flags
-                - Arguments appearing before any flag
-
-        Example:
-            py3 >>> Command.parse('find -name *.txt', {'name': 'search'})
-            Command(name='find', flags={'search': ['*.txt']})
-            py3 >>> Command('find -name *.txt', {'name': 'search'})
-            Command(name='find', flags={'search': ['*.txt']})
-        """
-        tokens = cmd_str.split()
         if not tokens:
             raise ValueError("Empty command")
+
         name = tokens[0]
         flags = {FlagNameConfig('', 'ROOT'): []}
         current_flag = None
-        for token in tokens[1:]:
+
+        for i in range(1, len(tokens)):
+            token = tokens[i]
+            is_quoted = quoted[i]
+
+            # Flag detection logic remains unchanged
             if token.startswith('--'):
                 long_flag = token[2:]
                 if long_flag not in [flag.long for flag in flag_map]:
                     raise ValueError(f"Unknown long flag: {token}")
-                current_flag = find_flag(long_flag)
+                current_flag = find_flag(flag_map, long_flag)
                 flags[current_flag] = []
             elif token.startswith('-'):
                 short_flag = token[1:]
@@ -90,11 +73,60 @@ class Command:
                 current_flag = find_flag(flag_map, short_flag)
                 flags[current_flag] = []
             else:
-                if not current_flag:
-                    flags[FlagNameConfig('', 'ROOT')].append(token)
+                try:
+                    # Process value with quote awareness
+                    parsed = cls._parse_value(token, is_quoted)
+                except ValueError as e:
+                    flag_name = current_flag.long if current_flag else 'ROOT'
+                    raise ArgumentValueError(f"{flag_name}: {str(e)}")
+
+                # Store parsed value
+                if current_flag:
+                    flags[current_flag].append(parsed)
                 else:
-                    flags[current_flag].append(token)
+                    flags[FlagNameConfig('', 'ROOT')].append(parsed)
+        
         return cls(name, flags)
+
+    @staticmethod
+    def _tokenize(s: str) -> tuple[list[str], list[bool]]:
+        """Tokenize with quote preservation using shlex non-POSIX mode"""
+        lex = shlex.shlex(s, posix=False)
+        lex.whitespace_split = True
+        lex.commenters = ''
+        
+        tokens = []
+        quoted = []
+        while True:
+            tok = lex.get_token()
+            if not tok: break
+            
+            # Detect quoting status from token boundaries
+            has_quotes = (tok.startswith("'") and tok.endswith("'")) or \
+                        (tok.startswith('"') and tok.endswith('"'))
+            
+            tokens.append(tok)
+            quoted.append(has_quotes)
+        return tokens, quoted
+
+    @staticmethod
+    def _parse_value(token: str, is_quoted: bool):
+        """Convert token to Python type with quote handling"""
+        if is_quoted:
+            # Strip quotes and preserve inner content
+            stripped = token[1:-1]
+            return stripped
+            
+        # Type conversion cascade
+        if token in ('True', 'False'):
+            return token == 'True'
+        try:
+            return int(token)
+        except ValueError:
+            try:
+                return float(token)
+            except ValueError:
+                raise ValueError(f"Unparsable token '{token}'")
 
     @classmethod
     def register(cls, command_name: str):

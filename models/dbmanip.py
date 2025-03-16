@@ -13,7 +13,7 @@ from models.memglobalstore_model import global_manager
 from models.converse_model import Converse, StoredConverse, ConverseTable
 from utils.exceptions import TableExistsError
 from utils.const import DB_PATH
-
+from utils.performance import PerformanceMetrics
 
 
 class DatabaseManager:
@@ -31,6 +31,7 @@ class DatabaseManager:
         """
         pass
     
+    @PerformanceMetrics.runtime_monitor
     def insert(self, converse: Converse):
         """Inserts a set of prompt & answer embedding arrays
 
@@ -44,7 +45,8 @@ class DatabaseManager:
                        (?, ?, ?, ?)
                        ''', (converse.prompt, converse.answer, ' '.join(map(str, converse.veci)), ' '.join(map(str, converse.veco))))
         self.conn.commit()
-    
+        
+    @PerformanceMetrics.runtime_monitor
     def create(self, table: str) -> sqlite3.Connection:
         """Creates a table in the database.
 
@@ -80,6 +82,7 @@ class DatabaseManager:
         global_manager.set('table', table)
         return self.conn
     
+    @PerformanceMetrics.runtime_monitor
     def fetch(self, table: str, limit: Optional[int] = 10, 
         old: bool = True, asc: bool = True) -> ConverseTable:
         """Retrieve conversations as a structured table with metadata.
@@ -129,6 +132,7 @@ class DatabaseManager:
             conversations=[self._row_to_converse(row) for row in rows]
         )
 
+    @PerformanceMetrics.runtime_monitor
     def tables(self) -> List[ConverseTable]:
         """Retrieves all conversation tables with their metadata and contents.
         
@@ -159,11 +163,12 @@ class DatabaseManager:
                         answer=conv.answer,
                         veci=conv.veci,
                         veco=conv.veco
-                    ) for conv in self.fetch(table=row[0], limit=None)
+                    ) for conv in self.fetch(table=row[0], limit=None).conversations
                 ]
             ) for row in self.cursor.fetchall()
         ]
         
+    @PerformanceMetrics.runtime_monitor
     def _row_to_converse(self, row: tuple) -> StoredConverse:
         """Convert database row to StoredConverse instance.
         
