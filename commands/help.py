@@ -15,10 +15,10 @@ from models.memglobalstore_model import global_manager
 
 # MARK: COMMANDS:
 @Command.register('help')
-def help(flags: Dict[str, List[FlagNameConfig]]):
+def help(flags: Dict[FlagNameConfig, List[str]]):
     """Gives help on TUI interface
     Arguments:
-        flags (Dict[str, List[str]]): Arguments
+        flags (Dict[FlagNameConfig, List[str]]): Arguments
     """
 
     if len(flags) == 0:

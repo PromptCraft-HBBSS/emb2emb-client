@@ -15,10 +15,10 @@ from models.memglobalstore_model import global_manager
 
 # MARK: COMMANDS:
 @Command.register('ls')
-def ls(flags: Dict[str, List[FlagNameConfig]]):
+def ls(flags: Dict[FlagNameConfig, List[str]]):
     """Lists all embeddings
     Arguments:
-        flags (Dict[str, List[str]]): Arguments
+        flags (Dict[FlagNameConfig, List[str]]): Arguments
     """
     flags = flagconfiglist2dic(flags);
 
