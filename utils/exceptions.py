@@ -35,6 +35,7 @@ class ExcessiveFlagsError(Exception):
     """Exception raised when more then required flags are stacked
     
     Usage:
+        <cmd> command requires <valid-count> flags, got <actual>
         --<long-flag> must be with only *--<other-flags>
         --<long-flag> must be used alone
     """

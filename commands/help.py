@@ -31,6 +31,6 @@ def help(flags: Dict[str, List[FlagNameConfig]]):
                 for command in flags['name']:
                     ClientConsole.help(command.long)
         else:
-            raise ExcessiveFlagsError('')
+            raise ExcessiveFlagsError(f'help command requires 1 flag, got {len(flags)}')
     
     ClientConsole.warn('FEATURE UNDER DEVELOPMENT')

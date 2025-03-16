@@ -15,7 +15,7 @@ from models.memglobalstore_model import global_manager
 
 # MARK: COMMANDS:
 @Command.register('ls')
-def ls(flags: Dict[str, List[str]]):
+def ls(flags: Dict[str, List[FlagNameConfig]]):
     """Lists all embeddings
     Arguments:
         flags (Dict[str, List[str]]): Arguments
